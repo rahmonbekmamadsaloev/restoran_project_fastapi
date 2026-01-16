@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 
 # URL подключения к базе (SQLite для примера)
-DATABASE_URL = "sqlite+aiosqlite:///./booking.db"
+DATABASE_URL = "sqlite+aiosqlite:///./restoran.db"
 
 # Создаём движок
 engine = create_async_engine(DATABASE_URL, echo=True)
