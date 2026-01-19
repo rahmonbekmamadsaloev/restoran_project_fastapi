@@ -3,9 +3,12 @@ from src.database import engine
 from src.account.models import BaseModel
 import uvicorn
 from src.account.views import user_admin
-
+from src.restoran.views import router as restoran_router
 app = FastAPI()
 app.include_router(prefix="/users", router=user_admin)
+app.include_router(restoran_router, prefix="/restoran", tags=["restoran"])
+
+
 
 # Создание таблиц при старте
 @app.on_event("startup")

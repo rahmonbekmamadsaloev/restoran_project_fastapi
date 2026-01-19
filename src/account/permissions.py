@@ -4,7 +4,7 @@ from sqlalchemy import select
 from src.database import get_session
 from .models import SessionModel, UserType, UserModel
 
-# Проверка авторизации
+
 async def is_authenticated(request: Request, db: AsyncSession = Depends(get_session)):
     credentials_error = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -20,10 +20,9 @@ async def is_authenticated(request: Request, db: AsyncSession = Depends(get_sess
     if not session:
         raise credentials_error
 
-    return session.user  # возвращаем объект UserModel
+    return session.user 
 
 
-# Проверка прав администратора
 async def is_admin(user: UserModel = Depends(is_authenticated)):
     if user.role != UserType.ADMIN:
         raise HTTPException(
@@ -33,7 +32,6 @@ async def is_admin(user: UserModel = Depends(is_authenticated)):
     return user
 
 
-# Проверка владельца (или админа)
 async def is_owner(user: UserModel = Depends(is_authenticated)):
     if str(user.role).lower() != UserType.ADMIN.value:
         raise HTTPException(

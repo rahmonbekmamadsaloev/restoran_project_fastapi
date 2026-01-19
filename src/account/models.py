@@ -45,6 +45,8 @@ class UserModel(BaseModel):
         back_populates="user",
         cascade="all, delete"
     )
+    
+    refresh_tokens = relationship( "RefreshToken", back_populates="user", cascade="all, delete-orphan" )
 
     def __repr__(self):
         return self.username
@@ -79,3 +81,15 @@ class SessionModel(BaseModel):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     user = relationship("UserModel", back_populates="user_session")
+    
+
+class RefreshToken(BaseModel):
+    __tablename__ = "refresh_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    token = Column(String, unique=True, index=True, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("UserModel", back_populates="refresh_tokens")
+

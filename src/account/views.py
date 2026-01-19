@@ -5,7 +5,7 @@ from fastapi import (
 )
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 
@@ -73,7 +73,7 @@ async def is_admin(current_user: UserModel = Depends(get_current_user)):
 
 # ================== REGISTER ==================
 
-@user_admin.post("/register")
+@user_admin.post("/register", tags=['auth'])
 async def register_endpoint(
     user: CreateUserModelSchema,
     db: AsyncSession = Depends(get_session),
@@ -105,7 +105,7 @@ async def register_endpoint(
 
 # ================== LOGIN ==================
 
-@user_admin.post("/login")
+@user_admin.post("/login", tags=['auth'])
 async def login_endpoint(
     user: LoginUserModel,
     db: AsyncSession = Depends(get_session),
@@ -115,19 +115,26 @@ async def login_endpoint(
     )
     login_user = result.scalar_one_or_none()
 
-    if not login_user or not verify_password(
-        user.password, login_user.password
-    ):
+    if not login_user or not verify_password(user.password, login_user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    token = create_access_token(
+    access_token = create_access_token(
         {"sub": str(login_user.id), "role": login_user.role.value}
     )
 
     return {
-        "access_token": token,
+        "access_token": access_token,
         "token_type": "bearer",
     }
+
+
+# ================== LOGOUT ==================
+
+@user_admin.post("/logout", tags=['auth'])
+async def logout_endpoint(
+    current_user: UserModel = Depends(get_current_user),
+):
+    return {"message": "Logged out successfully"}
 
 
 # ================== ME ==================
@@ -193,3 +200,4 @@ async def update_my_profile(
         "message": "Profile updated successfully",
         "profile": profile,
     }
+
