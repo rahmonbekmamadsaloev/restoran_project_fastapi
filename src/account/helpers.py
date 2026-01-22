@@ -15,7 +15,6 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 async def authenticate(username: str, password: str, db):
     """Аутентификация пользователя (асинхронная)"""
-    # выполняем асинхронный запрос
     result = await db.execute(
         select(UserModel).where(UserModel.username == username)
     )

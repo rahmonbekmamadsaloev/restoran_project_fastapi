@@ -11,7 +11,9 @@ from sqlalchemy.orm import DeclarativeBase, relationship
 from enum import Enum
 from datetime import datetime, date
 import uuid
-
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from typing import Optional, List
+from sqlalchemy import String, Text, Float, Boolean, DateTime, ForeignKey, Integer, BigInteger
 
 class BaseModel(DeclarativeBase):
     pass
@@ -20,6 +22,8 @@ class BaseModel(DeclarativeBase):
 class UserType(Enum):
     ADMIN = "admin"
     USER = "user"
+    ENTREPRENEUR = 'entrepreneur'  #придпринемател 
+    
 
 
 class UserModel(BaseModel):
@@ -32,7 +36,9 @@ class UserModel(BaseModel):
     role = Column(SqlEnum(UserType), nullable=False, default=UserType.USER)
     created_at = Column(Date, default=date.today)
 
-    # связи
+    restorans = relationship("Restoran", back_populates="user")
+
+
     profile = relationship(
         "UserProfile",
         back_populates="user",

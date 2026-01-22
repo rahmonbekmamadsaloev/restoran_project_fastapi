@@ -1,26 +1,31 @@
 from typing import Optional, List
 from sqlalchemy import String, Text, Float, Boolean, DateTime, ForeignKey, Integer, BigInteger
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-from src.database import Base
-from src.account.models import UserModel   
+from src.account.models import BaseModel
+from src.account.models import UserModel  
+from datetime import date, datetime 
 
-class Restoran(Base):
+
+class Restoran(BaseModel):
     __tablename__ = "restoran"
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     restoran_name: Mapped[str] = mapped_column(String, nullable=False)
-    description: Mapped[Optional[str]] = mapped_column(Text)
-    city: Mapped[Optional[str]] = mapped_column(String)
-    address: Mapped[Optional[str]] = mapped_column(String)
-    rating: Mapped[Optional[float]] = mapped_column(Float)
-    created_at: Mapped[Optional[DateTime]] = mapped_column(DateTime)
-    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"))  # ← исправлено
+    description: Mapped[str] = mapped_column(Text, nullable=True)
+    city: Mapped[str] = mapped_column(String, nullable=True)
+    address: Mapped[str] = mapped_column(String, nullable=True)
+    rating: Mapped[float] = mapped_column(Float, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    owner: Mapped["UserModel"] = relationship("UserModel", back_populates="restorans")
-    dishes: Mapped[List["Dish"]] = relationship("Dish", back_populates="restoran")
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+
+    # связь: каждый ресторан принадлежит одному пользователю
+    user = relationship("UserModel", back_populates="restorans")
+
+    dishes: Mapped[list["Dish"]] = relationship("Dish", back_populates="restoran")
 
 
-class CotigoruDish(Base):
+class CotigoruDish(BaseModel):
     __tablename__ = "cotigoru_dish"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, index=True)
@@ -31,7 +36,7 @@ class CotigoruDish(Base):
     dishes: Mapped[List["Dish"]] = relationship("Dish", back_populates="category")
 
 
-class Dish(Base):
+class Dish(BaseModel):
     __tablename__ = "dishes"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, index=True)
@@ -48,7 +53,7 @@ class Dish(Base):
     reviews: Mapped[List["Review"]] = relationship("Review", back_populates="dish")
 
 
-class Review(Base):
+class Review(BaseModel):
     __tablename__ = "reviews"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, index=True)

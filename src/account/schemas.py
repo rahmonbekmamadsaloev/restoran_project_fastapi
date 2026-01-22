@@ -8,7 +8,7 @@ class CreateUserModelSchema(BaseModel):
     email: EmailStr
     password: str
     confirm_password: str
-    role: Literal["admin", "user"] = "user"
+   
 
     @model_validator(mode="before")
     def check_passwords(cls, values):

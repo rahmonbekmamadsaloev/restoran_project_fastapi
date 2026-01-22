@@ -78,9 +78,6 @@ async def register_endpoint(
     user: CreateUserModelSchema,
     db: AsyncSession = Depends(get_session),
 ):
-    role_value = user.role.lower()
-    if role_value not in ("admin", "user"):
-        raise HTTPException(status_code=400, detail="Invalid role")
 
     if await db.scalar(select(UserModel).where(UserModel.email == user.email)):
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -92,7 +89,6 @@ async def register_endpoint(
         username=user.username,
         email=user.email,
         password=hash_password(user.password),
-        role=UserType(role_value),
     )
     db.add(new_user)
     await db.flush()
@@ -123,8 +119,7 @@ async def login_endpoint(
     )
 
     return {
-        "access_token": access_token,
-        "token_type": "bearer",
+        "access_token": access_token
     }
 
 
